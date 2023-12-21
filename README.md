@@ -3,3 +3,4 @@ Repository for the final project in Image Manipulation
 
 ## For CycleGAN 
 Pretrained models : https://efrosgans.eecs.berkeley.edu/cyclegan/pretrained_models/
+https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/scripts/download_cyclegan_model.sh
