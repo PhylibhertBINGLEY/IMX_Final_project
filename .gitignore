@@ -1,0 +1,44 @@
+# Python
+*.pyc
+__pycache__/
+
+# Environnements virtuels
+venv/
+env/
+env.bak/
+venv.bak/
+
+# Fichiers de configuration
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers de cache
+*.pyc
+*.pyo
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Cache de l'éditeur
+.idea/
+
+# Cache de l'éditeur Visual Studio Code
+.vscode/
+
+# Cache de l'éditeur Sublime Text
+.sublime-workspace
+.sublime-project
+
+# Fichiers de sauvegarde
+*~
+*.bak
+*.swp
+*.swo
+*.log
+*.tmp
+
+# Fichiers de configuration locaux
+.DS_Store
+desktop.ini
+Thumbs.db
