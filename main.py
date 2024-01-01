@@ -3,7 +3,10 @@ import deepMatting as dm
 import cycleGAN as cg
 
 # other imports
-import argparse      # for arg
+import argparse         # for arg
+from PIL import Image   # for images
+import matplotlib.pyplot as plt
+import numpy as np
 
 """
 Here the helper functions
@@ -36,3 +39,55 @@ if __name__ == "__main__":
     else:
         # Here we can apply our functions (follow the struct of the readme architecture part)
         printArgs(args.image, args.pretrained_model, args.applyToForeground)
+        # 2] Apply functions
+        # Load the image
+        image_path = args.image
+        image = Image.open(image_path)
+
+        # Convert the image to a list of lists (nested list) of pixels
+        image_array = np.array(image)
+
+        # Apply deepmatting
+        alpha_map = dm.deepmatting(image_array)
+
+        # Apply cycleGAN
+        stylized_image = cg.cycleGAN(image_array, args.pretrained_model)
+        
+        # Now matting:
+        foreground = np.zeros(image_array.shape)
+        background = np.zeros(image_array.shape)
+        for i in range(len(image_array)):
+            for j in range(len(image_array[0])):
+                foreground[i][j] = [alpha_map[i][j]*image_array[i][j][c]/255 for c in [0,1,2]]
+                background[i][j] = [(1-alpha_map[i][j])*stylized_image[i][j][c]/255 for c in [0,1,2]]
+
+        # Combine components
+        res = background + foreground
+    
+        # Display the original image
+        plt.subplot(151)
+        plt.imshow(image_array)
+        plt.title("Original Image")
+    
+        # Display the alpha map
+        plt.subplot(152)
+        plt.imshow(alpha_map, cmap='gray')
+        plt.title("Alpha Map")
+    
+        # Display the alpha part
+        plt.subplot(153)
+        plt.imshow(foreground)
+        plt.title("foreground Part")
+    
+        # Display the stylized part
+        plt.subplot(154)
+        plt.imshow(background)
+        plt.title("bg Part")
+    
+        # Display the result after matting
+        plt.subplot(155)
+        plt.imshow(res)
+        plt.title("Result after Matting")
+    
+        plt.show()
+
