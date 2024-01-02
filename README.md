@@ -14,3 +14,5 @@ The primary functionalities of our project encompass the extraction of a foregro
 - CycleGAN paper+code: https://junyanz.github.io/CycleGAN/
 - Pretrained models : https://efrosgans.eecs.berkeley.edu/cyclegan/pretrained_models/  
 and script to download them automatically https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/scripts/download_cyclegan_model.sh
+- Relevant styles (6 pretrained models):  
+summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh
