@@ -441,28 +441,19 @@ def main_matting(Image_cropped):
 
 foreground,background=main_matting(Im_Crop)
 
-print(f" for : {foreground.shape} , back {background.shape}")
-folder_path = '/content'
+#print(f" for : {foreground.shape} , back {background.shape}")
+#folder_path = '/content'
 
 # # Vérifier si le dossier existe
-if not os.path.exists(folder_path):
-    os.makedirs(folder_path)
-file_path = os.path.join(folder_path, '2.jpg')
+#if not os.path.exists(folder_path):
+#    os.makedirs(folder_path)
+#file_path = os.path.join(folder_path, '2.jpg')
 
 # Enregistrer l'image
-cv2.imwrite(file_path, foreground)
+#cv2.imwrite(file_path, foreground)
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 def deepmatting(image):
-    
-    # to test
-    alpha = []
-    for i,ligne in enumerate(image):
-        nouvelle_ligne = []
-        for pixel in ligne:
-            if(i<len(image)/2):
-                nouvelle_ligne.append(1)
-            else:
-                nouvelle_ligne.append(0)
-        alpha.append(nouvelle_ligne)
-    return alpha
+    (x, y, w, h), Original_Im, Im_Crop,Check = image_crop()
+    foreground,background=main_matting(Im_Crop)
+    return (foreground,(x, y, w, h))
