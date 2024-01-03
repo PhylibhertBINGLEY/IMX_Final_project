@@ -20,8 +20,6 @@ import pandas as pd
 from glob import glob
 from tqdm import tqdm
 
-
-
 def get_user_input():
     """ Demande à l'utilisateur s'il veut extraire les humains """
     while True:
@@ -30,90 +28,98 @@ def get_user_input():
             return int(user_input)
         print("Invalid input, please enter 0 or 1.")
 
-def image_crop():
-    import os
-    file_path = '/content/IMX_Final_project/Images/1.jpg' # Demande à l'utilisateur de saisir le chemin du fichier
+def image_crop(image):
+    # file_path = '/content/Images/1.jpg' # Demande à l'utilisateur de saisir le chemin du fichier
 
-    # Vérifie si un fichier a été sélectionné
-    if file_path:
-        # Vérifie l'extension du fichier
-        ext = os.path.splitext(file_path)[-1].lower()
-        if ext in ['.jpg', '.jpeg', '.png']:
-            print(f"Selected image: {file_path}")
+    # # Vérifie si un fichier a été sélectionné
+    # if file_path:
+    #     # Vérifie l'extension du fichier
+    #     ext = os.path.splitext(file_path)[-1].lower()
+    #     if ext in ['.jpg', '.jpeg', '.png']:
+    #         print(f"Selected image: {file_path}")
 
-            image_save = cv2.imread(file_path)
-            # Initialise le modèle YOLO à partir des poids pré-entraînés
-            model = YOLO('yolov8n.pt')
+    # image_save = image
+    # Initialise le modèle YOLO à partir des poids pré-entraînés
+    model = YOLO('yolov8n.pt')
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    # Effectue la détection sur l'image
+    results = model(image)
+    # folder_path = '/content'
+    # # # Vérifier si le dossier existe
+    # if not os.path.exists(folder_path):
+    #     os.makedirs(folder_path)
+    # file_path = os.path.join(folder_path, '2.jpg')
 
-            # Effectue la détection sur l'image
-            results = model(file_path)
-            print(len(results))
-            value = get_user_input()
+    # # Enregistrer l'image
+    # cv2.imwrite(file_path,image)
 
-            if value is not None:
-                print(f"User choice: {value}")
+    print(len(results))
+    value = get_user_input()
 
-                image = cv2.imread(file_path)
-                print(value)
-                for r in results:
-                    boxes = r.boxes
-                    # Parcourt les bounding boxes pour les dessiner sur l'image
-                    for bbox in boxes:
-                        if value == 0:
-                            list_bbox = []
-                            x1, y1, x2, y2 = bbox[0].xyxy[0]
-                        
-                            # Obtient les dimensions de l'image
-                            height, width, _ = image.shape
+    if value is not None:
+        print(f"User choice: {value}")
 
-                            # Définit une marge de sécurité
-                            margin = 10  # Par exemple, 10 pixels de marge de chaque côté
+        # image = cv2.imread(file_path)
+        print(value)
+        for r in results:
+            boxes = r.boxes
+            # Parcourt les bounding boxes pour les dessiner sur l'image
+            for bbox in boxes:
+                if value == 0:
+                    list_bbox = []
+                    x1, y1, x2, y2 = bbox[0].xyxy[0]
+                
+                    # Obtient les dimensions de l'image
+                    height, width, _ = image.shape
 
-                            # Agrandit la bounding box en ajoutant/soustrayant la marge aux coordonnées
-                            x1 = max(x1 - margin, 0)
-                            y1 = max(y1 - margin, 0)
-                            x2 = min(x2 + margin, width - 1)
-                            y2 = min(y2 + margin, height - 1)
+                    # Définit une marge de sécurité
+                    margin = 10  # Par exemple, 10 pixels de marge de chaque côté
 
-                            x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                            list_bbox.append((x1, x2, y1, y2))
-                            x1, x2, y1, y2 = list_bbox[0]
-                            cropped_image = image[y1:y2, x1:x2]
+                    # Agrandit la bounding box en ajoutant/soustrayant la marge aux coordonnées
+                    x1 = max(x1 - margin, 0)
+                    y1 = max(y1 - margin, 0)
+                    x2 = min(x2 + margin, width - 1)
+                    y2 = min(y2 + margin, height - 1)
 
-                            # # Chemin du dossier où vous voulez enregistrer l'image
-                            # folder_path = '/content/test'
+                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                    list_bbox.append((x1, x2, y1, y2))
+                    x1, x2, y1, y2 = list_bbox[0]
+                    cropped_image = image[y1:y2, x1:x2]
+        
 
-                            # # Vérifier si le dossier existe
-                            # if not os.path.exists(folder_path):
-                            #     os.makedirs(folder_path)
-                            # file_path = os.path.join(folder_path, '1.jpg')
+                    # # Chemin du dossier où vous voulez enregistrer l'image
+                    # folder_path = '/content/test'
 
-                            # Enregistrer l'image
-                            # cv2.imwrite(file_path, cropped_image)
+                    # # Vérifier si le dossier existe
+                    # if not os.path.exists(folder_path):
+                    #     os.makedirs(folder_path)
+                    # file_path = os.path.join(folder_path, '1.jpg')
 
-                            crop_copy = cropped_image.copy()
+                    # Enregistrer l'image
+                    # cv2.imwrite(file_path, cropped_image)
 
-                            w, h = x2 - x1, y2 - y1
+                    crop_copy = cropped_image.copy()
 
-                            if bbox[0].conf[0] > 0.50 and int(bbox[0].cls[0]) == 0:
-                                cvzone.cornerRect(image, (x1, y1, w, h))
-                # cv2.imshow('Image', image)
-                # cv2.waitKey(0)
-                # cv2.destroyAllWindows()
-            else:
-                print("No input provided by the user.")
-        else:
-            print("The selected file is not a valid file (JPG or PNG).")
+                    w, h = x2 - x1, y2 - y1
+
+                    if bbox[0].conf[0] > 0.50 and int(bbox[0].cls[0]) == 0:
+                        cvzone.cornerRect(image, (x1, y1, w, h))
+        # cv2.imshow('Image', image)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
     else:
-        print("No image has been selected.")
+        print("No input provided by the user.")
+# else:
+#     print("The selected file is not a valid file (JPG or PNG).")
+# else:
+# print("No image has been selected.")
 
     if value == 0:
-        return (((x1, y1, w, h), image_save, crop_copy,True))
+      return (((x1, y1, w, h), crop_copy,True))
     else:
-        return (((x1, y1, w, h), image_save, image_save,False))
-
+      return (((x1, y1, w, h), image,False))
 # image_crop()
-(x, y, w, h), Original_Im, Im_Crop,Check = image_crop()
+
 # if Check:
 #     Original_Im[y:y+h, x:x+w] = Im_Crop
 
@@ -478,6 +484,6 @@ foreground,background=main_matting(Im_Crop)
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 def deepmatting(image):
-    (x, y, w, h), Original_Im, Im_Crop,Check = image_crop()
+    (x, y, w, h), Im_Crop,Check = image_crop(image)
     foreground,background=main_matting(Im_Crop)
     return (foreground,(x, y, w, h))
