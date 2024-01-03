@@ -1,27 +1,3 @@
-"""
-code to interface deepmatting and our project
-"""
-""""""""""""""""""""""""""""""""""""""""""""""""
-#AJOUT THOMAS 
-import cv2
-from ultralytics import YOLO
-import cvzone
-import os
-import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, Activation, MaxPool2D, UpSampling2D, Concatenate, Add
-import numpy as np
-from glob import glob
-from sklearn.utils import shuffle
-from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger, ReduceLROnPlateau, EarlyStopping, TensorBoard
-from tensorflow.keras.optimizers import Adam
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import pandas as pd
-from glob import glob
-from tqdm import tqdm
-
-
-
 def get_user_input():
     """ Demande à l'utilisateur s'il veut extraire les humains """
     while True:
@@ -32,7 +8,7 @@ def get_user_input():
 
 def image_crop():
     import os
-    file_path = '/content/1.jpg' # Demande à l'utilisateur de saisir le chemin du fichier
+    file_path = '/content/IMX_Final_project/Images/1.jpg' # Demande à l'utilisateur de saisir le chemin du fichier
 
     # Vérifie si un fichier a été sélectionné
     if file_path:
@@ -61,7 +37,6 @@ def image_crop():
                     for bbox in boxes:
                         if value == 0:
                             list_bbox = []
-                            print(bbox[0].xyxy)
                             x1, y1, x2, y2 = bbox[0].xyxy[0]
                         
                             # Obtient les dimensions de l'image
@@ -81,16 +56,16 @@ def image_crop():
                             x1, x2, y1, y2 = list_bbox[0]
                             cropped_image = image[y1:y2, x1:x2]
 
-                            # Chemin du dossier où vous voulez enregistrer l'image
-                            folder_path = '/content/test'
+                            # # Chemin du dossier où vous voulez enregistrer l'image
+                            # folder_path = '/content/test'
 
-                            # Vérifier si le dossier existe
-                            if not os.path.exists(folder_path):
-                                os.makedirs(folder_path)
-                            file_path = os.path.join(folder_path, '1.jpg')
+                            # # Vérifier si le dossier existe
+                            # if not os.path.exists(folder_path):
+                            #     os.makedirs(folder_path)
+                            # file_path = os.path.join(folder_path, '1.jpg')
 
                             # Enregistrer l'image
-                            cv2.imwrite(file_path, cropped_image)
+                            # cv2.imwrite(file_path, cropped_image)
 
                             crop_copy = cropped_image.copy()
 
@@ -98,9 +73,9 @@ def image_crop():
 
                             if bbox[0].conf[0] > 0.50 and int(bbox[0].cls[0]) == 0:
                                 cvzone.cornerRect(image, (x1, y1, w, h))
-                cv2.imshow('Image', image)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+                # cv2.imshow('Image', image)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
             else:
                 print("No input provided by the user.")
         else:
@@ -118,8 +93,7 @@ def image_crop():
 # if Check:
 #     Original_Im[y:y+h, x:x+w] = Im_Crop
 
-
-
+print(f"La valeur est: {Im_Crop.shape}")
 
 def conv_block(inputs, out_ch, rate=1):
     x = Conv2D(out_ch, 3, padding="same", dilation_rate=1)(inputs)
@@ -274,7 +248,6 @@ def build_u2net_lite(input_shape, num_classes=1):
     model = u2net(input_shape, out_ch, int_ch, num_classes=num_classes)
     return model
 
-#from model import build_u2net_lite, build_u2net
 
 """ Global parameters """
 H = 512
@@ -375,87 +348,109 @@ def tf_dataset(X, Y, batch=2):
 
 
 
-def main_matting():
+def main_matting(Image_cropped):
     """ Seeding """
     np.random.seed(42)
     tf.random.set_seed(42)
 
-    """ Directory for storing files """
-    for item in ["joint", "mask"]:
-        create_dir(f"results/{item}")
+    # """ Directory for storing files """
+    # for item in ["joint", "mask"]:
+    #     create_dir(f"/content/results/{item}")
 
     """ Load the model """
-    model_path = '/content/files/model.h5'
+    model_path = '/content/IMX_Final_project/files/model.h5'
     model = tf.keras.models.load_model(model_path)
 
     """ Dataset """
-    images = glob("/content/test/*")
-    print(f"Images: {len(images)}")
+    images =Image_cropped
+    # print(f"Images: {len(images)}")
+
+    # """ Prediction """
+    # for x in tqdm(images, total=len(images)):
+    #     """ Extracting the name """
+    #     name = x.split("/")[-1]
+
+    #     """ Reading the image """
+    #     image = cv2.imread(x, cv2.IMREAD_COLOR)
+    x = cv2.resize(images, (W, H))
+    x = x/255.0
+    x = np.expand_dims(x, axis=0)
 
     """ Prediction """
-    for x in tqdm(images, total=len(images)):
-        """ Extracting the name """
-        name = x.split("/")[-1]
+    pred = model.predict(x, verbose=0)
 
-        """ Reading the image """
-        image = cv2.imread(x, cv2.IMREAD_COLOR)
-        x = cv2.resize(image, (W, H))
-        x = x/255.0
-        x = np.expand_dims(x, axis=0)
+    line = np.ones((H, 10, 3)) * 255
 
-        """ Prediction """
-        pred = model.predict(x, verbose=0)
+    """ Joint and save mask """
+    pred_list = []
+    for item in pred:
+        p = item[0] * 255
+        p = np.concatenate([p, p, p], axis=-1)
 
-        line = np.ones((H, 10, 3)) * 255
+        pred_list.append(p)
+        pred_list.append(line)
 
-        """ Joint and save mask """
-        pred_list = []
-        for item in pred:
-            p = item[0] * 255
-            p = np.concatenate([p, p, p], axis=-1)
+    # save_image_path = os.path.join("results", "mask", name)
+    # cat_images = np.concatenate(pred_list, axis=1)
+    # cv2.imwrite(save_image_path, cat_images)
 
-            pred_list.append(p)
-            pred_list.append(line)
+    """ Save final mask """
+    image_h, image_w, _ = images.shape
 
-        save_image_path = os.path.join("results", "mask", name)
-        cat_images = np.concatenate(pred_list, axis=1)
-        cv2.imwrite(save_image_path, cat_images)
+    y0 = pred[0][0]
+    y0 = cv2.resize(y0, (image_w, image_h))
+    y0 = np.expand_dims(y0, axis=-1)
+    y0 = np.concatenate([y0, y0, y0], axis=-1)
+    
 
-        """ Save final mask """
-        image_h, image_w, _ = image.shape
+    # # Extrait le premier plan en multipliant pixel par pixel avec le masque alpha
+    foreground = (y0 * images).astype(np.uint8)
 
-        y0 = pred[0][0]
-        y0 = cv2.resize(y0, (image_w, image_h))
-        y0 = np.expand_dims(y0, axis=-1)
-        y0 = np.concatenate([y0, y0, y0], axis=-1)
-        
+    # # Affichez le premier plan
+    # plt.imshow(cv2.cvtColor(foreground, cv2.COLOR_BGR2RGB))
+    # plt.axis('off')  # Enlever les axes pour une meilleure visualisation
+    # plt.show()
 
-        # # Extrait le premier plan en multipliant pixel par pixel avec le masque alpha
-        foreground = (y0 * image).astype(np.uint8)
+    inv=1-y0
+    back = (images*inv).astype(np.uint8)
 
-        # Affichez le premier plan
-        plt.imshow(cv2.cvtColor(foreground, cv2.COLOR_BGR2RGB))
-        plt.axis('off')  # Enlever les axes pour une meilleure visualisation
-        plt.show()
+    # # Affichez le premier plan
+    # plt.imshow(cv2.cvtColor(back, cv2.COLOR_BGR2RGB))
+    # plt.axis('off')  # Enlever les axes pour une meilleure visualisation
+    # plt.show()
 
-        inv=1-y0
-        back = (image*inv).astype(np.uint8)
+    # Affichez la shape de l'image y0
+    print('Shape de y0:', foreground.shape)
+    line = line = np.ones((image_h, 10, 3)) * 255
 
-        # Affichez le premier plan
-        plt.imshow(cv2.cvtColor(back, cv2.COLOR_BGR2RGB))
-        plt.axis('off')  # Enlever les axes pour une meilleure visualisation
-        plt.show()
+    cat_images = np.concatenate([images, line, y0*255, line, images*y0], axis=1)
+    # save_image_path = os.path.join("results", "joint", name)
+    # cv2.imwrite(save_image_path, cat_images)
 
-        # Affichez la shape de l'image y0
-        print('Shape de y0:', foreground.shape)
-        line = line = np.ones((image_h, 10, 3)) * 255
+    folder_path = '/content'
 
-        cat_images = np.concatenate([image, line, y0*255, line, image*y0], axis=1)
-        save_image_path = os.path.join("results", "joint", name)
-        cv2.imwrite(save_image_path, cat_images)
-        return((foreground,back))
+    # # Vérifier si le dossier existe
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+    file_path = os.path.join(folder_path, '1.jpg')
+
+    # Enregistrer l'image
+    cv2.imwrite(file_path, cat_images)
+    return((foreground,back))
 # training()
-main_matting()
+
+foreground,background=main_matting(Im_Crop)
+
+print(f" for : {foreground.shape} , back {background.shape}")
+folder_path = '/content'
+
+# # Vérifier si le dossier existe
+if not os.path.exists(folder_path):
+    os.makedirs(folder_path)
+file_path = os.path.join(folder_path, '2.jpg')
+
+# Enregistrer l'image
+cv2.imwrite(file_path, foreground)
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 def deepmatting(image):
