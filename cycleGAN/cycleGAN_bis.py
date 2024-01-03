@@ -18,7 +18,7 @@ from loadModelsCycleGAN import download_cyclegan_model
 
 
 
-def cycleGAN(image, model_without_pretrained):
+def cycleGAN_bis(image, model_without_pretrained):
 
     model_name = model_without_pretrained + '_pretrained'
 
