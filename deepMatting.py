@@ -21,6 +21,7 @@ from glob import glob
 from tqdm import tqdm
 
 
+
 def get_user_input():
     """ Demande à l'utilisateur s'il veut extraire les humains """
     while True:
