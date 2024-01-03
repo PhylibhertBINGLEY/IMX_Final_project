@@ -1,3 +1,26 @@
+"""
+code to interface deepmatting and our project
+"""
+""""""""""""""""""""""""""""""""""""""""""""""""
+#AJOUT THOMAS 
+import cv2
+from ultralytics import YOLO
+import cvzone
+import os
+import tensorflow as tf
+from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, Activation, MaxPool2D, UpSampling2D, Concatenate, Add
+import numpy as np
+from glob import glob
+from sklearn.utils import shuffle
+from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger, ReduceLROnPlateau, EarlyStopping, TensorBoard
+from tensorflow.keras.optimizers import Adam
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import pandas as pd
+from glob import glob
+from tqdm import tqdm
+
+
 def get_user_input():
     """ Demande à l'utilisateur s'il veut extraire les humains """
     while True:
