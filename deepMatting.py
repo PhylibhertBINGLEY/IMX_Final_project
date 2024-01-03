@@ -123,8 +123,6 @@ def image_crop(image):
 # if Check:
 #     Original_Im[y:y+h, x:x+w] = Im_Crop
 
-print(f"La valeur est: {Im_Crop.shape}")
-
 def conv_block(inputs, out_ch, rate=1):
     x = Conv2D(out_ch, 3, padding="same", dilation_rate=1)(inputs)
     x = BatchNormalization()(x)
@@ -469,7 +467,7 @@ def main_matting(Image_cropped):
     return((foreground,back))
 # training()
 
-foreground,background=main_matting(Im_Crop)
+# foreground,background=main_matting(Im_Crop)
 
 #print(f" for : {foreground.shape} , back {background.shape}")
 #folder_path = '/content'
