@@ -453,6 +453,7 @@ def main_matting():
         cat_images = np.concatenate([image, line, y0*255, line, image*y0], axis=1)
         save_image_path = os.path.join("results", "joint", name)
         cv2.imwrite(save_image_path, cat_images)
+        return((foreground,back))
 # training()
 main_matting()
 
