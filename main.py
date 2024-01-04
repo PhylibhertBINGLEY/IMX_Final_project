@@ -47,22 +47,57 @@ if __name__ == "__main__":
         # Convert the image to a list of lists (nested list) of pixels
         image_array = np.array(image)
 
-        # Apply deepmatting
-        alpha_map = dm.deepmatting(image_array)
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        # Apply deepmatting
+        original_image_with_alpha = dm.deepmatting(image_array)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""        
+       
         # Apply cycleGAN
         stylized_image = cg.cycleGAN(image_array, args.pretrained_model)
-        
-        # Now matting:
-        foreground = np.zeros(image_array.shape)
-        background = np.zeros(image_array.shape)
-        for i in range(len(image_array)):
-            for j in range(len(image_array[0])):
-                foreground[i][j] = [alpha_map[i][j]*image_array[i][j][c]/255 for c in [0,1,2]]
-                background[i][j] = [(1-alpha_map[i][j])*stylized_image[i][j][c]/255 for c in [0,1,2]]
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""        
+        background_image = stylized_image
 
-        # Combine components
-        res = background + foreground
+        # Assurez-vous que les images ont la même taille
+        if original_image_with_alpha.shape[:2] != background_image.shape[:2]:
+            # Redimensionner le fond pour correspondre à l'image de premier plan
+            from skimage.transform import resize
+            background_image = resize(background_image, original_image_with_alpha.shape[:2], mode='constant', anti_aliasing=True)
+            background_image = (background_image * 255).astype(np.uint8)  # Assurez-vous que background_image est en uint8
+
+        # Superposer l'image de premier plan avec le fond
+        # Convertir les deux images en float pour éviter des problèmes de type de données pendant le calcul
+        foreground = original_image_with_alpha.astype(float)
+        background = background_image.astype(float)
+
+        # Normaliser l'alpha canal pour qu'il soit compris entre 0 et 1
+        alpha = foreground[:, :, 3] / 255.0
+
+        # Faire le calcul pour la superposition
+        # Notez que le dernier canal de 'foreground' est l'alpha
+        for color in range(0, 3):  # Vous parcourez seulement les trois premiers canaux (R, G, B)
+            background[:, :, color] = alpha * foreground[:, :, color] + (1 - alpha) * background[:, :, color]
+
+        # Convertir le résultat en uint8
+        background = background.astype(np.uint8)
+
+        # Sauvegarder l'image résultante
+        Image.fromarray(background).save('image_superposee.png', 'PNG')
+
+#plus nécessaire
+
+          # Now matting:
+        #foreground = np.zeros(image_array.shape)
+        #background = np.zeros(image_array.shape)
+        #for i in range(len(image_array)):
+            #for j in range(len(image_array[0])):
+                #foreground[i][j] = [alpha_map[i][j]*image_array[i][j][c]/255 for c in [0,1,2]]
+                #background[i][j] = [(1-alpha_map[i][j])*stylized_image[i][j][c]/255 for c in [0,1,2]]
+        #res = background + foreground
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""        
+
     
         # Display the original image
         plt.subplot(151)
