@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from glob import glob
 from tqdm import tqdm
+from PIL import Image
 
 def get_user_input():
     """ Demande à l'utilisateur s'il veut extraire les humains """
@@ -29,29 +30,10 @@ def get_user_input():
         print("Invalid input, please enter 0 or 1.")
 
 def image_crop(image):
-    # file_path = '/content/Images/1.jpg' # Demande à l'utilisateur de saisir le chemin du fichier
-
-    # # Vérifie si un fichier a été sélectionné
-    # if file_path:
-    #     # Vérifie l'extension du fichier
-    #     ext = os.path.splitext(file_path)[-1].lower()
-    #     if ext in ['.jpg', '.jpeg', '.png']:
-    #         print(f"Selected image: {file_path}")
-
-    # image_save = image
-    # Initialise le modèle YOLO à partir des poids pré-entraînés
     model = YOLO('yolov8n.pt')
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     # Effectue la détection sur l'image
     results = model(image)
-    # folder_path = '/content'
-    # # # Vérifier si le dossier existe
-    # if not os.path.exists(folder_path):
-    #     os.makedirs(folder_path)
-    # file_path = os.path.join(folder_path, '2.jpg')
-
-    # # Enregistrer l'image
-    # cv2.imwrite(file_path,image)
 
     print(len(results))
     value = get_user_input()
@@ -87,16 +69,6 @@ def image_crop(image):
                     cropped_image = image[y1:y2, x1:x2]
         
 
-                    # # Chemin du dossier où vous voulez enregistrer l'image
-                    # folder_path = '/content/test'
-
-                    # # Vérifier si le dossier existe
-                    # if not os.path.exists(folder_path):
-                    #     os.makedirs(folder_path)
-                    # file_path = os.path.join(folder_path, '1.jpg')
-
-                    # Enregistrer l'image
-                    # cv2.imwrite(file_path, cropped_image)
 
                     crop_copy = cropped_image.copy()
 
@@ -104,24 +76,15 @@ def image_crop(image):
 
                     if bbox[0].conf[0] > 0.50 and int(bbox[0].cls[0]) == 0:
                         cvzone.cornerRect(image, (x1, y1, w, h))
-        # cv2.imshow('Image', image)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
-    else:
+        
         print("No input provided by the user.")
-# else:
-#     print("The selected file is not a valid file (JPG or PNG).")
-# else:
-# print("No image has been selected.")
+
 
     if value == 0:
       return (((x1, y1, w, h), crop_copy,True))
     else:
       return (((x1, y1, w, h), image,False))
-# image_crop()
 
-# if Check:
-#     Original_Im[y:y+h, x:x+w] = Im_Crop
 
 def conv_block(inputs, out_ch, rate=1):
     x = Conv2D(out_ch, 3, padding="same", dilation_rate=1)(inputs)
@@ -381,25 +344,15 @@ def main_matting(Image_cropped):
     np.random.seed(42)
     tf.random.set_seed(42)
 
-    # """ Directory for storing files """
-    # for item in ["joint", "mask"]:
-    #     create_dir(f"/content/results/{item}")
-
     """ Load the model """
     model_path = '/content/IMX_Final_project/files/model.h5'
     model = tf.keras.models.load_model(model_path)
-
+   
+    
+    Image_cropped = cv2.cvtColor(Image_cropped, cv2.COLOR_RGB2BGR)
     """ Dataset """
     images =Image_cropped
-    # print(f"Images: {len(images)}")
-
-    # """ Prediction """
-    # for x in tqdm(images, total=len(images)):
-    #     """ Extracting the name """
-    #     name = x.split("/")[-1]
-
-    #     """ Reading the image """
-    #     image = cv2.imread(x, cv2.IMREAD_COLOR)
+   
     x = cv2.resize(images, (W, H))
     x = x/255.0
     x = np.expand_dims(x, axis=0)
@@ -417,11 +370,6 @@ def main_matting(Image_cropped):
 
         pred_list.append(p)
         pred_list.append(line)
-
-    # save_image_path = os.path.join("results", "mask", name)
-    # cat_images = np.concatenate(pred_list, axis=1)
-    # cv2.imwrite(save_image_path, cat_images)
-
     """ Save final mask """
     image_h, image_w, _ = images.shape
 
@@ -429,59 +377,69 @@ def main_matting(Image_cropped):
     y0 = cv2.resize(y0, (image_w, image_h))
     y0 = np.expand_dims(y0, axis=-1)
     y0 = np.concatenate([y0, y0, y0], axis=-1)
-    
 
-    # # Extrait le premier plan en multipliant pixel par pixel avec le masque alpha
     foreground = (y0 * images).astype(np.uint8)
-
-    # # Affichez le premier plan
-    # plt.imshow(cv2.cvtColor(foreground, cv2.COLOR_BGR2RGB))
-    # plt.axis('off')  # Enlever les axes pour une meilleure visualisation
-    # plt.show()
 
     inv=1-y0
     back = (images*inv).astype(np.uint8)
-
-    # # Affichez le premier plan
-    # plt.imshow(cv2.cvtColor(back, cv2.COLOR_BGR2RGB))
-    # plt.axis('off')  # Enlever les axes pour une meilleure visualisation
-    # plt.show()
-
-    # Affichez la shape de l'image y0
-    print('Shape de y0:', foreground.shape)
-    line = line = np.ones((image_h, 10, 3)) * 255
-
-    cat_images = np.concatenate([images, line, y0*255, line, images*y0], axis=1)
-    # save_image_path = os.path.join("results", "joint", name)
-    # cv2.imwrite(save_image_path, cat_images)
-
+   
     folder_path = '/content'
-
-    # # Vérifier si le dossier existe
+      # # Vérifier si le dossier existe
     if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
-    file_path = os.path.join(folder_path, '1.jpg')
+      os.makedirs(folder_path)
+    file_path = os.path.join(folder_path, 'cat.jpg')
 
-    # Enregistrer l'image
-    cv2.imwrite(file_path, cat_images)
-    return((foreground,back))
-# training()
-
-# foreground,background=main_matting(Im_Crop)
-
-#print(f" for : {foreground.shape} , back {background.shape}")
-#folder_path = '/content'
-
-# # Vérifier si le dossier existe
-#if not os.path.exists(folder_path):
-#    os.makedirs(folder_path)
-#file_path = os.path.join(folder_path, '2.jpg')
-
-# Enregistrer l'image
-#cv2.imwrite(file_path, foreground)
+    alpha_map=y0*255
+  # Enregistrer l'image
+    cv2.imwrite(file_path,alpha_map)
+    print('Shape de alpha:', alpha_map.shape)
+   
+    # return((foreground,back))
+    return(alpha_map)
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 def deepmatting(image):
-    (x, y, w, h), Im_Crop,Check = image_crop(image)
-    foreground,background=main_matting(Im_Crop)
-    return (foreground,(x, y, w, h))
+  #   (x, y, w, h), Im_Crop,Check = image_crop(image)
+
+  #   folder_path = '/content'
+  #     # # Vérifier si le dossier existe
+  #   if not os.path.exists(folder_path):
+  #     os.makedirs(folder_path)
+  #   file_path = os.path.join(folder_path, 'crop.jpg')
+
+  # # Enregistrer l'image
+  #   cv2.imwrite(file_path,Im_Crop)
+
+
+    alpha_map=main_matting(image)
+    # alpha_mask_path = '/content/cat.jpg'     # Remplacer par le chemin vers votre masque alpha
+
+# Charger l'image originale et la convertir en un tableau numpy
+    original_image = image
+
+    # Charger le masque alpha, le convertir en niveau de gris et en tableau numpy
+    # alpha_mask = np.array(Image.open(alpha_mask_path).convert('L'))
+    
+    def rgb_to_grayscale(rgb_image):
+      return np.dot(rgb_image[..., :3], [0.2989, 0.5870, 0.1140])
+
+# Utilisez cette fonction pour convertir votre image couleur en niveaux de gris
+    alpha_mask = rgb_to_grayscale(alpha_map).astype(np.uint8)
+
+
+
+    # Assurer que le masque alpha est du même shape que l'image originale
+    if alpha_mask.shape != original_image.shape[:2]:
+        # Vous devrez peut-être redimensionner le masque alpha pour qu'il corresponde
+        # Utilisez scipy.ndimage.zoom, skimage.transform.resize ou une fonction similaire pour redimensionner
+        from skimage.transform import resize
+        alpha_mask = resize(alpha_mask, original_image.shape[:2], mode='constant', anti_aliasing=True)
+        alpha_mask = (alpha_mask * 255).astype(np.uint8)  # Assurez-vous que l'alpha_mask est en uint8
+
+    # Ajouter le canal alpha à l'image RGB pour obtenir une image RGBA
+    original_image_with_alpha = np.dstack((original_image, alpha_mask))
+
+    # Sauvegarder l'image résultante avec un fond transparent
+    Image.fromarray(original_image_with_alpha).save('votre_image_avec_transparence.png', format='PNG')
+    # return (foreground,(x, y, w, h))
+    return (original_image_with_alpha)
