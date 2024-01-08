@@ -405,7 +405,7 @@ def deepmatting(image):
     # (x, y, w, h), Im_Crop, Check = image_crop(image)
 
     # Call the training function, presumably to train a model for matting
-    training()
+    #training()
 
     # Generate the alpha map (matte) for the given image
     alpha_map = main_matting(image)
