@@ -7,6 +7,7 @@ import argparse         # for arg
 from PIL import Image   # for images
 import matplotlib.pyplot as plt
 import numpy as np
+from skimage.transform import resize
 
 """
 Here the helper functions
@@ -50,7 +51,7 @@ if __name__ == "__main__":
 
 #""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
         # Apply deepmatting
-        original_image_with_alpha = deepmatting(image_array)
+        original_image_with_alpha = deep_matting(image_array)
 #""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""        
        
         # Apply cycleGAN
@@ -58,70 +59,29 @@ if __name__ == "__main__":
 #""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""        
         background_image = stylized_image
 
-        # Assurez-vous que les images ont la même taille
+        # Ensure the images are of the same size
         if original_image_with_alpha.shape[:2] != background_image.shape[:2]:
-            # Redimensionner le fond pour correspondre à l'image de premier plan
-            from skimage.transform import resize
+            # Resize the background to match the foreground image
             background_image = resize(background_image, original_image_with_alpha.shape[:2], mode='constant', anti_aliasing=True)
-            background_image = (background_image * 255).astype(np.uint8)  # Assurez-vous que background_image est en uint8
-
-        # Superposer l'image de premier plan avec le fond
-        # Convertir les deux images en float pour éviter des problèmes de type de données pendant le calcul
+            background_image = (background_image * 255).astype(np.uint8)  # Ensure that the background_image is in uint8
+        
+        # Superimpose the foreground image over the background
+        # Convert both images to float to avoid data type issues during the computation
         foreground = original_image_with_alpha.astype(float)
         background = background_image.astype(float)
-
-        # Normaliser l'alpha canal pour qu'il soit compris entre 0 et 1
+        
+        # Normalize the alpha channel so that it is between 0 and 1
         alpha = foreground[:, :, 3] / 255.0
-
-        # Faire le calcul pour la superposition
-        # Notez que le dernier canal de 'foreground' est l'alpha
-        for color in range(0, 3):  # Vous parcourez seulement les trois premiers canaux (R, G, B)
+        
+        # Perform the computation for the superimposition
+        for color in range(0, 3):
             background[:, :, color] = alpha * foreground[:, :, color] + (1 - alpha) * background[:, :, color]
-
-        # Convertir le résultat en uint8
+        
+        # Convert the result back to uint8
         background = background.astype(np.uint8)
-
-        # Sauvegarder l'image résultante
+        
+        # Save the resulting image
         Image.fromarray(background).save('image_superposee.png', 'PNG')
 
-#plus nécessaire
-
-          # Now matting:
-        #foreground = np.zeros(image_array.shape)
-        #background = np.zeros(image_array.shape)
-        #for i in range(len(image_array)):
-            #for j in range(len(image_array[0])):
-                #foreground[i][j] = [alpha_map[i][j]*image_array[i][j][c]/255 for c in [0,1,2]]
-                #background[i][j] = [(1-alpha_map[i][j])*stylized_image[i][j][c]/255 for c in [0,1,2]]
-        #res = background + foreground
 
 
-#""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""        
-'''
-    
-        # Display the original image
-        plt.subplot(151)
-        plt.imshow(image_array)
-        plt.title("Original Image")
-    
-        # Display the alpha map
-        plt.subplot(152)
-        plt.imshow(alpha_map, cmap='gray')
-        plt.title("Alpha Map")
-    
-        # Display the alpha part
-        plt.subplot(153)
-        plt.imshow(foreground)
-        plt.title("foreground Part")
-    
-        # Display the stylized part
-        plt.subplot(154)
-        plt.imshow(background)
-        plt.title("bg Part")
-    
-        # Display the result after matting
-        plt.subplot(155)
-        plt.imshow(res)
-        plt.title("Result after Matting")
-    
-        plt.show()'''
