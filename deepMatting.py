@@ -401,7 +401,7 @@ def main_matting(Image_cropped):
     return alpha_map
 
 """"""""""""""""""""""""""""""""""""""""""""""""
-def deepmatting(image):
+def deep_matting(image):
     # (x, y, w, h), Im_Crop, Check = image_crop(image)
 
     # Call the training function, presumably to train a model for matting
