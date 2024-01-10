@@ -21,13 +21,14 @@ summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, styl
 # How to run the project
 ## On google colab
 - First make sure to be connected to a GPU
+- About the choice of the image to test our project: please chose an image with a human person on it and some background. The best results are with portraits of people. Please, name the image you have chosen 'image.jpg'. 
 - Then run the following commands:
   
 !git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project 
 
 import os 
 
-os.chdir('IMX_Final_project/') 
+os.chdir('IMX_Final_project/')  # after running this line, put the image of your choice at the root of the 'IMX_Final_project/' folder, and make sur to have named the image "image.jpg"
 
 ! pip install ultralytics 
 
