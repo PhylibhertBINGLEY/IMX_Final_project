@@ -12,6 +12,7 @@ The primary functionalities of our project encompass the extraction of a foregro
 # Additional ressources
 ## For CycleGAN
 - CycleGAN paper+code: https://junyanz.github.io/CycleGAN/
+- We used this CycleGAN open source project: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/tree/master
 - Pretrained models : https://efrosgans.eecs.berkeley.edu/cyclegan/pretrained_models/  
 and script to download them automatically https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/scripts/download_cyclegan_model.sh
 - Relevant styles (6 pretrained models):  
