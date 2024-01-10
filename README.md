@@ -21,13 +21,15 @@ summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, styl
 ## On google colab
 - First make sure to be connected to a GPU
 - Then run the following commands: 
-!git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project 
-import os 
-os.chdir('IMX_Final_project/') 
-! pip install ultralytics 
-! pip install cvzone 
- #available models are summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh 
+!git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project
+import os
+os.chdir('IMX_Final_project/')
+! pip install ultralytics
+! pip install cvzone
+#available models are summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh
  !python3 main.py image.jpg --pretrained_model summer2winter_yosemite
+
+
 
 
 
