@@ -17,10 +17,10 @@ and script to download them automatically https://github.com/junyanz/pytorch-Cyc
 - Relevant styles (6 pretrained models):  
 summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh
 
-### How to run the project
+# How to run the project
 ## On google colab
-# First make sure to be connected to a GPU 
-# The run the following commands: 
+### First make sure to be connected to a GPU 
+### The run the following commands: 
 !git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project 
 import os 
 os.chdir('IMX_Final_project/') 
