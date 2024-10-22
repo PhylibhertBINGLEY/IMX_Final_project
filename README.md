@@ -23,49 +23,20 @@ summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, styl
 - First make sure to be connected to a GPU
 - About the choice of the image to test our project: please chose an image with a human person on it and some background. The best results are with portraits of people. Please, name the image you have chosen 'image.jpg'. 
 - Then run the following commands:
-
-# 1. Clone the repository
-!git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project 
-
-# 2. Navigate to the project directory
-import os 
-os.chdir('IMX_Final_project/')  
-# Note: After running this line, 
-# place your image at the root of the 'IMX_Final_project/' folder,
-# and name it "image.jpg".
-
-# 3. Install required dependencies
-!pip install ultralytics 
-!pip install cvzone 
-
-# 4. Available models:
-available_models=(
-    "summer2winter_yosemite"
-    "winter2summer_yosemite"
-    "style_monet"
-    "style_cezanne"
-    "style_ukiyoe"
-    "style_vangogh"
-)
-echo "Available models: ${available_models[@]}"
-
-
-
-
   
-!git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project 
+> !git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project 
 
-import os 
+> import os 
 
-os.chdir('IMX_Final_project/')  # after running this line, put the image of your choice at the root of the 'IMX_Final_project/' folder, and make sur to have named the image "image.jpg"
+> os.chdir('IMX_Final_project/')  # after running this line, put the image of your choice at the root of the 'IMX_Final_project/' folder, and make sur to have named the image "image.jpg"
 
-! pip install ultralytics 
+> ! pip install ultralytics 
 
-! pip install cvzone 
+> ! pip install cvzone 
 
-#available models are summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh 
-
- !python3 main.py image.jpg --pretrained_model summer2winter_yosemite
+> available models are summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh 
+>
+> ! python3 main.py image.jpg --pretrained_model summer2winter_yosemite
 
 
 
