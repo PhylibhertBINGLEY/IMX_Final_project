@@ -30,13 +30,13 @@ summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, styl
 
 > os.chdir('IMX_Final_project/')
 >
-> # after running the previous command line, put the image of your choice at the root of the 'IMX_Final_project/' folder, and make sure to have named the image "image.jpg"
+> *after running the previous command line, put the image of your choice at the root of the 'IMX_Final_project/' folder, and make sure to have named the image "image.jpg"*
 
 > ! pip install ultralytics 
 
 > ! pip install cvzone 
 
-> # available models are summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh 
+> *available models are summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh* 
 >
 > ! python3 main.py image.jpg --pretrained_model summer2winter_yosemite
 
