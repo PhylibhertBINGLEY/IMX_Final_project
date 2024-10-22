@@ -24,17 +24,19 @@ summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, styl
 - About the choice of the image to test our project: please chose an image with a human person on it and some background. The best results are with portraits of people. Please, name the image you have chosen 'image.jpg'. 
 - Then run the following commands:
   
-> !git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project 
+> ! git clone https://github.com/PhylibhertBINGLEY/IMX_Final_project 
 
 > import os 
 
-> os.chdir('IMX_Final_project/')  # after running this line, put the image of your choice at the root of the 'IMX_Final_project/' folder, and make sur to have named the image "image.jpg"
+> os.chdir('IMX_Final_project/')
+>
+> # after running the previous command line, put the image of your choice at the root of the 'IMX_Final_project/' folder, and make sure to have named the image "image.jpg"
 
 > ! pip install ultralytics 
 
 > ! pip install cvzone 
 
-> available models are summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh 
+> # available models are summer2winter_yosemite, winter2summer_yosemite, style_monet, style_cezanne, style_ukiyoe, style_vangogh 
 >
 > ! python3 main.py image.jpg --pretrained_model summer2winter_yosemite
 
